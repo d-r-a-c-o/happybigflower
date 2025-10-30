@@ -1,61 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Hidden Link Timer</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    #timer {
-      font-size: 3rem;
-      margin-bottom: 20px;
-    }
-    #hidden-link {
-      display: none;
-      background: #4CAF50;
-      color: white;
-      padding: 15px 25px;
-      text-decoration: none;
-      border-radius: 8px;
-      font-size: 1.2rem;
-      transition: background 0.3s;
-    }
-    #hidden-link:hover {
-      background: #45a049;
-    }
+    :root{--bg:#0f1720;--fg:#e6eef8;--accent:#16a34a}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--fg);display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;}
+    .card{max-width:720px;padding:2rem;border-radius:12px}
+    h1{margin:.25rem 0 1rem;font-size:1.6rem}
+    #timer{font-size:3rem;font-weight:700;margin-bottom:1rem}
+    #hidden-link{display:none;padding:.9rem 1.4rem;border-radius:10px;text-decoration:none;background:var(--accent);color:white;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.35);}
+    #hidden-link:focus{outline:3px solid rgba(255,255,255,.12)}
+    .muted{opacity:.7;font-size:.9rem;margin-top:1rem}
   </style>
 </head>
 <body>
+  <div class="card">
+    <h1>Hang on — unlocking soon</h1>
+    <div id="timer" aria-live="polite">665</div>
+    <a id="hidden-link" target="_blank" rel="noopener noreferrer">Continue</a>
+    <div class="muted">The link will appear when the timer reaches 0.</div>
+  </div>
 
-<h1>Wait for the image to unlock 2dih :3</h1>
-<div id="timer">1200</div>
-<a id="hidden-link" href="https://files.catbox.moe/8ubspo.jpg">Click here to continue ;3</a>
+  <script>
+    let seconds = 665;
 
-<script>
-  let timeLeft = 1200; // Change this to however many seconds you want
-  const timer = document.getElementById('timer');
-  const link = document.getElementById('hidden-link');
+    const ENCODED_URL = "aHR0cHM6Ly9tZWRpYS5kaXNjb3JkYXBwLm5ldC9hdHRhY2htZW50cy8xMzc3NDQyMjI3ODQzODk1Mzc2LzE0MTU0MjgwNDA3OTk4MTM4MjcvMjAyNTA1MjdfMDMwODQ5LmpwZz9leD02OTA0NmRkNiZpcz02OTAzMWM1NiZobT0zNGZjYWQ2NTMzOGJiNTgxYzNiOTI5YjkyZGIxNzJlMzJjMWQzZjY4MTlhNDNlOTJjMTc2ZTkxN2EyODVlODBjJj0mZm9ybWF0PXdlYnAmd2lkdGg9NDA4JmhlaWdodD04ODU=";
 
-  const countdown = setInterval(() => {
-    timeLeft--;
-    timer.textContent = timeLeft;
-    if(timeLeft <= 0){
-      clearInterval(countdown);
-      timer.style.display = 'none';
-      link.style.display = 'inline-block';
+    function chunkAndShuffle(s){
+      const size = Math.max(6, Math.floor(s.length/3));
+      const chunks = [];
+      for(let i=0;i<s.length;i+=size) chunks.push(s.slice(i,i+size));
+      return chunks.map((c,i)=> i%2===0 ? c : c.split('').reverse().join(''));
     }
-  }, 1000);
-</script>
+    function rebuildFromChunks(arr){
+      return arr.map((c,i)=> i%2===0 ? c : c.split('').reverse().join('')).join('');
+    }
+    const obfChunks = chunkAndShuffle(ENCODED_URL);
 
+    const timerEl = document.getElementById('timer');
+    const linkEl = document.getElementById('hidden-link');
+    timerEl.textContent = seconds;
+
+    const interval = setInterval(() => {
+      seconds--;
+      if (seconds <= 0) {
+        clearInterval(interval);
+        timerEl.style.display = 'none';
+        const encoded = rebuildFromChunks(obfChunks);
+        try {
+          const url = atob(encoded);
+          linkEl.href = url;
+          linkEl.style.display = 'inline-block';
+          linkEl.focus();
+        } catch(e) {
+          linkEl.textContent = "Error: link unavailable";
+          linkEl.style.display = 'inline-block';
+        }
+      } else {
+        timerEl.textContent = seconds;
+      }
+    }, 1000);
+  </script>
 </body>
 </html>
