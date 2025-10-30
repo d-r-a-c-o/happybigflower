@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hidden Link Timer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #timer {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    #hidden-link {
+      display: none;
+      background: #4CAF50;
+      color: white;
+      padding: 15px 25px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      transition: background 0.3s;
+    }
+    #hidden-link:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Wait for the link to unlock</h1>
+<div id="timer">5</div>
+<a id="hidden-link" href="https://example.com">Click here to continue</a>
+
+<script>
+  let timeLeft = 5; // Change this to however many seconds you want
+  const timer = document.getElementById('timer');
+  const link = document.getElementById('hidden-link');
+
+  const countdown = setInterval(() => {
+    timeLeft--;
+    timer.textContent = timeLeft;
+    if(timeLeft <= 0){
+      clearInterval(countdown);
+      timer.style.display = 'none';
+      link.style.display = 'inline-block';
+    }
+  }, 1000);
+</script>
+
+</body>
+</html>
